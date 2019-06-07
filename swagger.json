@@ -1,0 +1,162 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Religram API",
+    "description": "Tài liệu đặc tả API cho phía fontend.",
+    "version": "1.0.0"
+  },
+  "host": "api.religram.relipa.com",
+  "basePath": "/v1",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Authenticate"
+    },
+    {
+      "name": "post",
+      "description": "API liên quan đến bài post"
+    },
+    {
+      "name": "user",
+      "description": "API dành cho các user"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/post/list": {
+      "get": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Danh sách các post.",
+        "description": "Trả về danh sách các bài post với các thông tin bao gồm:\n- avatar user (url ảnh)\n- tên user\n- danh sách ảnh up lên\n- số lượng like\n- số lượng comment\n- link api get danh sách user đã like bài post\n- link api get danh sách các comment",
+        "operationId": "getPostList",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Trả về  danh sách các bài post",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Post"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "default": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
+    "/post": {
+      "post": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Post bài viết",
+        "description": "Dùng để user đăng một bài post mới lên tường trang chủ nhà mình",
+        "operationId": "postPost",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "images upload",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Post"
+            }
+          },
+          "401": {
+            "$ref": "#/responses/UnauthorizedError"
+          }
+        },
+        "security": [
+          {
+            "religram_auth": []
+          }
+        ]
+      }
+    }
+  },
+  "responses": {
+    "UnauthorizedError": {
+      "description": "API key is missing or invalid",
+      "headers": {
+        "Authorization": {
+          "description": "Bearer {token}",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "religram_auth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization"
+    }
+  },
+  "definitions": {
+    "Post": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "content": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "xml": {
+            "name": "images",
+            "wrapped": true
+          },
+          "items": {
+            "$ref": "#/definitions/Image"
+          }
+        }
+      },
+      "xml": {
+        "name": "Post"
+      }
+    },
+    "Image": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Image"
+      }
+    }
+  }
+}
